@@ -1,0 +1,23 @@
+setup vxlan with ovs:
+在Linux中有两种方式配置vxlan，一种是使用openvswitch，另外一种是linux native方式。这两种方式都能实现vxlan功能，但是它们的代码没有一毛钱关系，不要以为谁是在谁基础上实现的。其中linux native方式是3.7内核才引入的。它已经被一些发行版backport到老内核上，你如果使用CentOS/RHEL的2.6.32 openstack内核，也是支持的，不过貌似用户态工具还没有更新，你可能需要自己编译一个新版的iproute2软件包才能用。另外有一个需要注意的地方，vxlan草案规定vxlan使用udp端口4789，ovs遵循了这个标准，但是native实现中默认使用8472，当然你可以用命令改变默认端口。
+
+	M1:
+	ovs-vsctl add-port obr0 vxlan0 -- set interface vxlan0 type=vxlan options:remote_ip=192.168.1.220 options:key=42 options:dst_port=4444 options:group=239.1.1.1
+	ifconfig obr0 1.1.1.1/24
+	M2:
+	ovs-vsctl add-port obr0 vxlan0 -- set interface vxlan0 type=vxlan options:remote_ip=192.168.1.193 options:key=42 options:dst_port=4444 options:group=239.1.1.1
+	ifconfig obr0 1.1.1.2/24
+local port 不必加入到ovs中。
+
+#ovs-vsctl show
+3d415e1c-2fbe-4c4e-a5e1-609f5fb48da1
+    Bridge "obr0"
+        Port "obr0"
+            Interface "obr0"
+                type: internal
+        Port "vxlan0"
+            Interface "vxlan0"
+                type: vxlan
+                options: {dst_port="4444", group="239.1.1.1", key="42", remote_ip="192.168.1.193"}
+    ovs_version: "2.1.3"
+

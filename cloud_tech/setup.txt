@@ -1,0 +1,90 @@
+http://www.docin.com/p-294591523.html
+1. DR:
+#derector:
+vip:192.168.1.109 ip:192.168.1.208
+ifconfig eth8:0 192.168.1.109 netmask 255.255.255.255 broadcast 192.168.1.109
+route add -host 192.168.1.109 dev eth8:0
+
+ipvsadm -A -t 192.168.1.109:80
+ipvsadm -a -t 192.168.1.109:80 -r 192.168.1.108:80 -g 
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+#real server:
+vip:192.168.1.109 ip: 192.168.1.108
+ifconfig lo:0 192.168.1.109 netmask 255.255.255.255 broadcast 192.168.1.109
+route add -host 192.168.1.109 dev lo:0
+
+ip addr add 192.168.1.108/24 dev eth0
+
+echo 1 > /proc/sys/net/ipv4/conf/lo/arp_ignore
+echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore
+echo 2 > /proc/sys/net/ipv4/conf/lo/arp_announce
+echo 2 > /proc/sys/net/ipv4/conf/all/arp_announce
+
+
+#client
+curl http://192.168.1.109
+=====================================
+pcap:
+client:
+ip:192.168.1.207 MAC:00:00:C9:E6:28:E8
+derector: ip:192.168.1.208 MAC:00:10:18:AB:B3:93
+rs: ip:192.168.1.108 MAC:2C:44:FD:7E:45:5E
+
+derector:
+[root@hp-dl385g7-02 ~]# tcpdump -i eth8 tcp and port 80 -en
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth8, link-type EN10MB (Ethernet), capture size 65535 bytes
+22:26:39.430168 00:00:c9:e6:28:e8 > 00:10:18:ab:b3:93, ethertype IPv4 (0x0800), length 74: 192.168.1.207.37476 > 192.168.1.109.http: Flags [S], seq 4261955269, win 14600, options [mss 1460,sackOK,TS val 35825709 ecr 0,nop,wscale 7], length 0
+22:26:39.430198 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 74: 192.168.1.207.37476 > 192.168.1.109.http: Flags [S], seq 4261955269, win 14600, options [mss 1460,sackOK,TS val 35825709 ecr 0,nop,wscale 7], length 0
+22:26:39.430539 00:00:c9:e6:28:e8 > 00:10:18:ab:b3:93, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [.], ack 761446829, win 115, options [nop,nop,TS val 35825710 ecr 3942501], length 0
+22:26:39.430546 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [.], ack 1, win 115, options [nop,nop,TS val 35825710 ecr 3942501], length 0
+22:26:39.430816 00:00:c9:e6:28:e8 > 00:10:18:ab:b3:93, ethertype IPv4 (0x0800), length 234: 192.168.1.207.37476 > 192.168.1.109.http: Flags [P.], seq 0:168, ack 1, win 115, options [nop,nop,TS val 35825710 ecr 3942501], length 168
+22:26:39.430822 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 234: 192.168.1.207.37476 > 192.168.1.109.http: Flags [P.], seq 0:168, ack 1, win 115, options [nop,nop,TS val 35825710 ecr 3942501], length 168
+22:26:39.432166 00:00:c9:e6:28:e8 > 00:10:18:ab:b3:93, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [.], ack 4185, win 137, options [nop,nop,TS val 35825711 ecr 3942502], length 0
+22:26:39.432182 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [.], ack 4185, win 137, options [nop,nop,TS val 35825711 ecr 3942502], length 0
+22:26:39.432792 00:00:c9:e6:28:e8 > 00:10:18:ab:b3:93, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [F.], seq 168, ack 4186, win 137, options [nop,nop,TS val 35825712 ecr 3942502], length 0
+22:26:39.432798 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37476 > 192.168.1.109.http: Flags [F.], seq 168, ack 4186, win 137, options [nop,nop,TS val 35825712 ecr 3942502], length 0
+
+rs:
+
+[root@hp-dl380pg8-06 ~]# tcpdump -i eth2 tcp and port 80 -en
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth2, link-type EN10MB (Ethernet), capture size 65535 bytes
+
+
+22:28:04.351793 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 74: 192.168.1.207.37491 > 192.168.1.109.http: Flags [S], seq 2201431003, win 14600, options [mss 1460,sackOK,TS val 35910635 ecr 0,nop,wscale 7], length 0
+22:28:04.351840 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 74: 192.168.1.109.http > 192.168.1.207.37491: Flags [S.], seq 3248980741, ack 2201431004, win 14480, options [mss 1460,sackOK,TS val 4027427 ecr 35910635,nop,wscale 7], length 0
+22:28:04.352065 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37491 > 192.168.1.109.http: Flags [.], ack 1, win 115, options [nop,nop,TS val 35910636 ecr 4027427], length 0
+22:28:04.352363 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 234: 192.168.1.207.37491 > 192.168.1.109.http: Flags [P.], seq 1:169, ack 1, win 115, options [nop,nop,TS val 35910636 ecr 4027427], length 168
+22:28:04.352390 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 66: 192.168.1.109.http > 192.168.1.207.37491: Flags [.], ack 169, win 122, options [nop,nop,TS val 4027428 ecr 35910636], length 0
+22:28:04.353657 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 2962: 192.168.1.109.http > 192.168.1.207.37491: Flags [.], seq 1:2897, ack 169, win 122, options [nop,nop,TS val 4027429 ecr 35910636], length 2896
+22:28:04.353691 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 1354: 192.168.1.109.http > 192.168.1.207.37491: Flags [P.], seq 2897:4185, ack 169, win 122, options [nop,nop,TS val 4027429 ecr 35910636], length 1288
+22:28:04.353798 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 66: 192.168.1.109.http > 192.168.1.207.37491: Flags [F.], seq 4185, ack 169, win 122, options [nop,nop,TS val 4027429 ecr 35910636], length 0
+22:28:04.354212 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37491 > 192.168.1.109.http: Flags [.], ack 4185, win 137, options [nop,nop,TS val 35910638 ecr 4027429], length 0
+22:28:04.354584 00:10:18:ab:b3:93 > 2c:44:fd:7e:45:5e, ethertype IPv4 (0x0800), length 66: 192.168.1.207.37491 > 192.168.1.109.http: Flags [F.], seq 169, ack 4186, win 137, options [nop,nop,TS val 35910638 ecr 4027429], length 0
+22:28:04.354614 2c:44:fd:7e:45:5e > 00:00:c9:e6:28:e8, ethertype IPv4 (0x0800), length 66: 192.168.1.109.http > 192.168.1.207.37491: Flags [.], ack 170, win 122, options [nop,nop,TS val 4027430 ecr 35910638], length 0
+
+
+=====================
+分析:
+client 往derector 发数据，被director转发到rs，rs直接回给客户端。
+====
+2. NAT
+#director:
+vip:10.66.86.105  ip:192.168.1.208
+
+ipvsadm -A -t 10.66.86.105:80 -s rr
+ipvsadm -a -t 10.66.86.105:80 -r 192.168.1.108:80 -m
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+#rs
+ip:192.168.1.108 192.168.1.109
+route del default
+route add default gw 192.168.1.208
+
+httpd sometimes doesn't work,use nc. 
+#while true;do nc -l 80;done
+
+

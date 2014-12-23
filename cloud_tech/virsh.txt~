@@ -1,0 +1,50 @@
+virsh usage:
+1.install:
+rpm -qa |grep -q pexpect || yum install -y  pexpect
+yum install -y qemu-kvm qemu-img qemu-kvm-common qemu-kvm-tools
+yum install -y libvirt libvirt-python virt-viewer virt-manager virt-install
+systemctl start libvirtd || service libvirtd start
+2.setup host bridge:
+brctl add-if br0 eth2
+brctl addif br0 eth2
+dhclient br0
+3.img file:
+mount 10.66.90.128:/vol/S2/kvmauto /media/
+cp /media/linux_img/$image_file /var/lib/libvirt/images/$image_file (cp  /media/linux_img/RHEL-Server-6.5-64-virtio.qcow2 /var/lib/libvirt/images/)
+
+4. prepare vm env:
+host_br=br0
+vm_macaddr=`vm_get_macaddr`
+vm_get_macaddr()                                                                                                                                               
+{                                                                                                                                                              
+        rstr=`date +%s`                                                                                                                                        
+        vm_macaddr=00:${rstr:0:2}:${rstr:2:2}:${rstr:4:2}:${rstr:6:2}:${rstr:8:2}                                                                              
+        sleep 1                                                                                                                                                
+        echo $vm_macaddr                                                                                                                                       
+}
+start:
+------------------------------------------------------------------------------------
+virt-install --name vm1 --ram=2048 --vcpus=2 \
+--disk path=/var/lib/libvirt/images/$image,device=disk,bus=virtio,format=qcow2 \
+--boot hd \
+--network bridge=$host_br,model=virtio,mac=$vm_macaddr  \
+--graphics vnc,listen=0.0.0.0 \
+--accelerate \
+--force  > /dev/null 2>&1
+-----------------------------------------------------------------------------------
+5. virsh命令：
+virsh console vm1 #login to console of vm1
+virsh --connect qemu:///system start vm1  #start vm1
+ctrl + ]  #exit console
+virsh connect qemu+ssh://root@10.66.87.97/system #connect to remote libvirtd
+================
+error: Failed to connect to the hypervisor
+error: Cannot read CA certificate '/etc/pki/CA/cacert.pem': No such file or directory
+solution:
+listen_tls = 0
+listen_tcp = 1
+service libvirtd restart
+or http://wiki.libvirt.org/page/TLSDaemonConfiguration
+
+
+

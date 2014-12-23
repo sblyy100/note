@@ -1,0 +1,10 @@
+1.server: netserver -4/6 -p port
+2.client: netperf -H ip,4/6 -t UDP_STREAM/ -p remote_port -l time -- -m localsize -M remote_size
+
+-t 
+TCP_STREAM 
+TCP_RR
+UDP_STREAM
+UDP_RR
+SCTP_STREAM
+

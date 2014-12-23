@@ -1,0 +1,35 @@
+pci passthrough-vfio：
+1. 安装模块
+[root@hp-dl580g7-01 ~]# modprobe vfio
+[root@hp-dl580g7-01 ~]# modprobe vfio-pci
+2.设备unbind
+	a.查看iommu_group及其下所有设备，以0000:11:00.0为例。
+[root@hp-dl580g7-01 ~]#  cd /sys/bus/pci/devices/0000:11:00.0
+
+  readlink iommu_group    #查看iommu_group名字
+ 
+  [root@hp-dl580g7-01 0000:11:00.0]# readlink iommu_group
+../../../../kernel/iommu_groups/18
+	ll iommu_group/devices  #这样可以显示和该设备处于一个iommu_group的设备。
+	b. 需要将iommu_group下所有设备unbind并添加到iommu_group中  
+	echo 0000:11:00.0 > /sys/bus/pci/devices/0000:11:00.0/driver/unbind  
+	echo 0000:11:00.1 > /sys/bus/pci/devices/0000:11:00.1/driver/unbind 
+	
+	echo 8086 10fb > /sys/bus/pci/drivers/vfio-pci/new_id
+	
+	find vendor & device ID 8086:10fb
+	[root@hp-dl580g7-01 0000:11:00.0]# lspci -v -nn -mm -s 0000:11:00.0
+Slot:	11:00.0
+Class:	Ethernet controller [0200]
+Vendor:	Intel Corporation [8086]
+Device:	82599ES 10-Gigabit SFI/SFP+ Network Connection [10fb]
+SVendor:	Intel Corporation [8086]
+SDevice:	Ethernet Server Adapter X520-2 [000c]
+PhySlot:	11
+Rev:	01
+  
+3. 启动虚拟机
+modprobe kvm
+modprobe kvm-intel 
+
+/usr/libexec/qemu-kvm -name vm1 	-drive file=/home/rhel7_vm1.qcow2,if=none,id=drive-virtio-disk1,media=disk,cache=none,snapshot=off,format=qcow2,aio=native -device virtio-blk-pci,drive=drive-virtio-disk1,id=virtio-disk1,bootindex=0 -serial pty -vnc :10 -qmp tcp:0:1010,server,nowait -smp 2,cores=1,threads=1,sockets=2 -m 4096  -device vfio-pci,host=0000:11:00.0

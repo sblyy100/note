@@ -1,0 +1,4 @@
+setup ptp:
+ptp4l -i nic -m -f /etc/ptp4l.conf
+modify /etc/ptp4l.conf priority to decide which is master,which is slave.
+

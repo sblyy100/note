@@ -1,0 +1,31 @@
+1. common:
+service openvswitch start
+ovs-vsctl add-br vbr0
+ovs-vsctl add-port vbr0 eth1
+ovs-vsctl add-port vbr0 eth2
+ovs-vsctl set bridge vbr0 stp_enable=true
+
+2. openflow:
+>start controller: 
+	tests/test-controller ptcp:8888:0.0.0.0 &
+use 
+
+POX Controller:https://github.com/noxrepo/pox
+
+>connect controller:
+	ovs-vsctl set-controller vbr0 tcp:192.168.1.239:8888
+	
+[root@hp-dl380pg8-05 openvswitch-2.3.0]# netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
+    
+tcp        0      0 0.0.0.0:8888                0.0.0.0:*                   LISTEN      34300/tests/test-co       
+tcp        0      0 192.168.1.239:8888          192.168.1.77:35816          ESTABLISHED 34300/tests/test-co 
+tcp        0      0 192.168.1.239:8888          192.168.1.235:38977         ESTABLISHED 34300/tests/test-co 
+tcp        0      0 10.66.87.97:22              10.66.13.111:50184          ESTABLISHED 34188/sshd          
+
+ovs-ofctl show vbr0
+ovs-ofctl dump-flows vbr0
+ovs-ofctl add-flow of-switch "in_port=LOCAL,table=0,idle_timeout=60,ip,hard_timeout=60,vlan_tci=0x0000, dl_src=78:2b:cb:4b:db:c5,dl_dst=00:09:8a:02:80:c0, nw_proto=1,nw_dst=192.168.1.100, nw_src=192.168.7.189,actions=drop"
+ovs-ofctl dump-tables vbr0
+
