@@ -1,0 +1,11 @@
+1. yum install --enablerepo=fedora-debuginfo --enablerepo=updates-debuginfo kexec-tools crash kernel-debuginfo
+2. Next, edit /boot/grub/grub.conf or /boot/grub2/grub.cfg and add the "crashkernel=128M" command line option. 
+    linux /vmlinuz-3.1.4-1.fc16.x86_64 ro root=/dev/VolGroup00/LogVol00 rhgb LANG=en_US.UTF-8 crashkernel=128M
+3.edit /etc/kdump.conf, default is path /var/vmcore
+net lenovo-thinkstation-01.rhts.eng.nay.redhat.com:/home/kdump/vmcore
+
+4.reboot machine
+#service start kdump
+#systemctl start kdump.service
+
+
