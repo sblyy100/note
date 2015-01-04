@@ -1,3 +1,17 @@
+linux upstream:
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+=====================
+[sbl@baoliang RHSA-2014:19457-02]$ cat ~/.gitconfig 
+[user]
+    user = Sun Baoliang
+	email = blsun@redhat.com
+[push]
+	default = simple
+[branch]
+	autosetuprebase = always
+[branch "master"]
+		rebase = true
+
 auto git pull --rebase:
 git config --global branch.autosetuprebase always
 git config --global branch.master.rebase true
@@ -11,4 +25,5 @@ git checkout  commit_id file_name  //取文件file_name的 在commit_id是的版
 =============================
 查看某次提交在对应tag：
 git log --oneline --decorate |egrep "4e002|kernel-2.6.32"	#--decorate会打印出对应tag
+
 

@@ -29,3 +29,12 @@ ovs-ofctl dump-flows vbr0
 ovs-ofctl add-flow of-switch "in_port=LOCAL,table=0,idle_timeout=60,ip,hard_timeout=60,vlan_tci=0x0000, dl_src=78:2b:cb:4b:db:c5,dl_dst=00:09:8a:02:80:c0, nw_proto=1,nw_dst=192.168.1.100, nw_src=192.168.7.189,actions=drop"
 ovs-ofctl dump-tables vbr0
 
+start:/usr/lib/systemd/system/openvswitch.service
+[root@unused ~]# ps -ef|grep ovs
+root      3489  3437  0 14:44 pts/0    00:00:00 grep --color=auto ovs
+root     15152     1  0 Dec29 ?        00:00:00 ovsdb-server: monitoring pid 15153 (healthy)
+root     15153 15152  0 Dec29 ?        00:00:01 ovsdb-server /etc/openvswitch/conf.db -vconsole:emer -vsyslog:err -vfile:info --remote=punix:/var/run/openvswitch/db.sock --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --no-chdir --log-file=/var/log/openvswitch/ovsdb-server.log --pidfile=/var/run/openvswitch/ovsdb-server.pid --detach --monitor
+root     15166     1  0 Dec29 ?        00:00:00 ovs-vswitchd: monitoring pid 15167 (healthy)
+root     15167 15166  0 Dec29 ?        00:00:00 ovs-vswitchd unix:/var/run/openvswitch/db.sock -vconsole:emer -vsyslog:err -vfile:info --mlockall --no-chdir --log-file=/var/log/openvswitch/ovs-vswitchd.log --pidfile=/var/run/openvswitch/ovs-vswitchd.pid --detach --monitor
+
+
