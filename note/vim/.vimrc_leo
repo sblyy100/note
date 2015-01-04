@@ -1,0 +1,76 @@
+"My Config
+
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" Enable file type detection.
+" Use the default filetype settings, so that mail gets 'tw' set to 72,
+" 'cindent' is on in C files, etc.
+" Also load indent files, to automatically do language-dependent indenting.
+filetype plugin indent on    " required
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" General
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+set ts=8        " set tab with four space
+" set expandtab " Convert all tabs typed to spaces
+set sw=8        " set autoindent four space
+" set encoding=prc   " make vim stand by chinese
+" set fileencoding=prc  " make filename stand by chinese
+set fileencodings=utf-8-bom,ucs-bom,utf-8,cp936,gb18030,ucs,big5,iso-8859-15 " vim can edit chinese
+set number           " set number
+set autoindent       " set autoindent
+set smartindent
+set nobackup
+set tw=78 fo+=Mm        "change to another line after 78 characters"
+set nocp
+highlight WhitespaceEOL ctermbg=red guibg=red
+match WhitespaceEOL /\s\+$/
+
+set colorcolumn=80  "only can be use on vim 7.3+"
+"set paste
+"don't let vim help set typography when insert c codes"
+
+" enable/disable high light "
+map     <F12>   :set nohlsearch! hlsearch?<CR>
+
+" dont create swp file when edit a file "
+set noswapfile
+
+" Config C indent as kernel codingstyle
+set cinoptions=:0,l1,t0,g0
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ctags & Cscope
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"set scope setting"
+"set cscopequickfix=s-,c-,d-,i-,t-,e-
+" find where functions/macro/enumeration used
+nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+" find where functions/macro/enumeration defined
+nmap <C-_>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+" find the functions which called this function
+nmap <C-_>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+" find strings
+nmap <C-_>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+" use egrep mode
+nmap <C-_>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+" find and open file, like find in vim
+nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+" find files that include this file
+nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+" find the functions that this function called
+nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+
+

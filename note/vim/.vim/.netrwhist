@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/home/sbl/case/kernel/networking/vlan/vlan_virt/common'
+let g:netrw_dirhist_2='/home/sbl/case/kernel/networking/tcp/bugs'
+let g:netrw_dirhist_3='/home/sbl/case/kernel/networking/sctp/fuzz_init'
+let g:netrw_dirhist_4='/home/sbl/case/kernel/networking/vnic/sriov_test'
+let g:netrw_dirhist_5='/home/sbl/git/stream/y-stream/rhel7/net/rose'
+let g:netrw_dirhist_6='/home/sbl/case/kernel/networking/netperf/regular_netperf'
+let g:netrw_dirhist_7='/home/sbl/case/kernel/networking/nic/link_speed_check'
