@@ -15,6 +15,10 @@ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 auto git pull --rebase:
 git config --global branch.autosetuprebase always
 git config --global branch.master.rebase true
+git config --global core.editor vim
+git config --global merge.tool vimdiff
+git config --list
+
 ==================
 #revert to an version:
 git checkout master     //取出master版本的head 
