@@ -26,8 +26,18 @@ git checkout tmp
 git checkout tag_name    //在当前分支上 取出 tag_name 的版本
 git checkout  master file_name  //放弃当前对文件file_name的修改
 git checkout  commit_id file_name  //取文件file_name的 在commit_id是的版本。commit_id为 git commit 时的sha值。
+=======================
+回退提交：
+git reset --hard HEAD~1 #回退到上一个提交的地方
 =============================
 查看某次提交在对应tag：
 git log --oneline --decorate |egrep "4e002|kernel-2.6.32"	#--decorate会打印出对应tag
-
-
+===============================
+merge from branch;
+1.
+git checkout master
+git merge dev
+2. git chrry-pick xxx
+如果有冲突：
+1. 手动解决冲突,git add,git commit
+git log  --graph --pretty=oneline --abbrev-commit #查看结果   --graph显示分支提交历史 --pretty=oneline 只显示一行 --abbrev-commit精简方式显示hash
