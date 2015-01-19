@@ -1,0 +1,59 @@
+1.setup:
+ipip:
+#ip tun add ip1 mode ipip remote 10.66.87.109  local 10.66.86.101
+#ip link set ip1 up
+#ip add add 1.1.1.1/24 dev ip1
+
+gre:
+#ip tun add gre1 mode gre remote 10.66.87.109  local 10.66.86.101
+#ip link set gre1 up
+#ip add add 2.2.2.1/24 dev gre1
+
+# ip tun
+gre0: gre/ip  remote any  local any  ttl inherit  nopmtudisc
+gre1: gre/ip  remote 10.66.87.109  local 10.66.86.101  ttl inherit 
+tunl0: ip/ip  remote any  local any  ttl inherit 
+ip1: ip/ip  remote 10.66.87.109  local 10.66.86.101  ttl inherit
+
+#ip link
+12: tunl0: <NOARP> mtu 0 qdisc noop state DOWN mode DEFAULT 
+    link/ipip 10.66.86.101 brd 10.66.87.109
+13: ip1@NONE: <POINTOPOINT,NOARP> mtu 1480 qdisc noop state DOWN mode DEFAULT 
+    link/ipip 10.66.86.101 peer 10.66.87.109
+14: gre0: <NOARP> mtu 1476 qdisc noop state DOWN mode DEFAULT 
+    link/gre 10.66.86.101 brd 10.66.87.109
+15: gretap0: <BROADCAST,MULTICAST> mtu 1476 qdisc noop state DOWN mode DEFAULT qlen 1000
+    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+16: gre1@NONE: <POINTOPOINT,NOARP> mtu 1476 qdisc noop state DOWN mode DEFAULT 
+    link/gre 10.66.86.101 peer 10.66.87.109
+    
+gre 会自动创建 gretap0， ipip会自动创建tunl0
+
+两种tunnel不同点：
+[root@hp-dl388g8-02 ~]# lsmod |grep ipip
+ipip                   13472  0 
+tunnel4                13252  1 ipip
+ip_tunnel              23768  2 ipip,ip_gre
+[root@hp-dl388g8-02 ~]# 
+[root@hp-dl388g8-02 ~]# 
+[root@hp-dl388g8-02 ~]# 
+[root@hp-dl388g8-02 ~]# lsmod |grep gre
+ip_gre                 18244  0 
+gre                    13808  1 ip_gre
+ip_tunnel              23768  2 ipip,ip_gre
+
+ipip是点对点的tunnel，而gre是端对端，是建立在router之间的，对host来说，tunnel是透明的，所以可以收发广播包。
+经实验，ipip也可以建在两router之间。
+实现：
+ipip采用了xfrm tunnel的通用框架（tunnel4.c）.
+static struct xfrm_tunnel ipip_handler = {
+        .handler        =       ipip_rcv,
+        .err_handler    =       ipip_err,
+        .priority       =       1,
+};
+gre则采用了注册一种新的协议（网络层）：
+static const struct net_protocol net_gre_protocol = {
+        .handler     = gre_rcv,
+        .err_handler = gre_err,
+        .netns_ok    = 1,
+};
