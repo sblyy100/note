@@ -48,3 +48,27 @@ void AVL_Rotate_Right(AVL_NODE **ppstSubTree)
 
     return;
 } /* AVL_Rotate_Right */
+void AVL_Rotate_Left(AVL_NODE **ppstSubTree)
+{
+    /* rotate a ppstSubTree of the AVL tree left                              */
+    AVL_NODE *pstRightSon;
+
+    pstRightSon = (*ppstSubTree)->pstRight;
+
+    (*ppstSubTree)->pstRight = pstRightSon->pstLeft;
+    if (NULL != (*ppstSubTree)->pstRight)
+    {
+        (*ppstSubTree)->pstRight->pstParent = (*ppstSubTree);
+    }
+
+    (*ppstSubTree)->sRHeight = pstRightSon->sLHeight;
+    pstRightSon->pstParent   = (*ppstSubTree)->pstParent;
+    pstRightSon->pstLeft     = *ppstSubTree;
+    pstRightSon->pstLeft->pstParent = pstRightSon;
+    pstRightSon->sLHeight    = (1 + VOS_V2_AVL_MAX((*ppstSubTree)->sRHeight,
+                                                   (*ppstSubTree)->sLHeight));
+
+    *ppstSubTree = pstRightSon;
+
+    return;
+} /* AVL_Rotate_Left */
