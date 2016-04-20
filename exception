@@ -1,8 +1,0 @@
-[root@localhost ~]# objdump -t libsfefei.so | grep "FEI_CST_GetNext" | grep .text 
-00000000001ca978 g     F .text  00000000000006f9              FEI_CST_GetNext
-00000000001e7597 g     F .text  0000000000000499              FEI_CST_GetNextNode
-00000000001de7ad g     F .text  0000000000000411              FEI_CST_GetNextByCrossByHashKey
-[root@localhost ~]# 00000000001ca978^C
-[root@localhost ~]# addr2line -e libsfefei.so 1CAE1B
-/usr1/code/TRUNK_FENIX_Compile/code/current/VRP/VFP/msu/src/sfe_ctl/fei/fei/common/source/fei_tblm_cst.c:3543
-[root@localhost ~]# 
