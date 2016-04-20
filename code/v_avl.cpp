@@ -72,3 +72,79 @@ void AVL_Rotate_Left(AVL_NODE **ppstSubTree)
 
     return;
 } /* AVL_Rotate_Left */
+void AVL_Swap_Right_Most(AVL_TREE *pstTree,
+                             AVL_NODE *pstSubTree,
+                             AVL_NODE *pstNode)
+{
+    /* swap pstNode with right-most descendent of specified pstSubTree        */
+    AVL_NODE *pstSwapNode;
+    AVL_NODE *pstSwapParent;
+    AVL_NODE *pstSwapLeft;
+
+    //VOS_ASSERT(NULL != pstNode->pstRight);
+    //VOS_ASSERT(NULL != pstNode->pstLeft);
+    if ((NULL == pstNode->pstRight) || (NULL == pstNode->pstLeft))
+    {
+        return;
+    }
+    /* find right-most descendent of pstSubTree                               */
+    pstSwapNode = pstSubTree;
+    while (NULL != pstSwapNode->pstRight)
+    {
+        pstSwapNode = pstSwapNode->pstRight;
+    }
+
+    //VOS_ASSERT(pstSwapNode->sRHeight == 0);
+    //VOS_ASSERT(pstSwapNode->sLHeight <= 1);
+    if ((0 != pstSwapNode->sRHeight) || (pstSwapNode->sLHeight > 1))
+    {
+        return;
+    }
+
+    /* save parent and left-son of right-most descendent                      */
+    pstSwapParent = pstSwapNode->pstParent;
+    pstSwapLeft = pstSwapNode->pstLeft;
+
+    /* move swap pstNode to its new position                                  */
+    pstSwapNode->pstParent = pstNode->pstParent;
+    pstSwapNode->pstRight  = pstNode->pstRight;
+    pstSwapNode->pstLeft   = pstNode->pstLeft;
+    pstSwapNode->sRHeight  = pstNode->sRHeight;
+    pstSwapNode->sLHeight  = pstNode->sLHeight;
+    pstSwapNode->pstRight->pstParent = pstSwapNode;
+    pstSwapNode->pstLeft->pstParent  = pstSwapNode;
+    if (NULL == pstNode->pstParent)
+    {
+        /* pstNode is at root of pstTree                                      */
+        pstTree->pstRoot = pstSwapNode;
+    }
+    else if (pstNode->pstParent->pstRight == pstNode)
+    {
+        /* pstNode is right-son of parent                                     */
+        pstSwapNode->pstParent->pstRight = pstSwapNode;
+    }
+    else
+    {
+        /* pstNode is left-son of parent                                      */
+        pstSwapNode->pstParent->pstLeft = pstSwapNode;
+    }
+
+    /* move pstNode to its new position                                       */
+    pstNode->pstParent = pstSwapParent;
+    pstNode->pstRight  = NULL;
+    pstNode->pstLeft   = pstSwapLeft;
+    if (NULL != pstNode->pstLeft)
+    {
+        pstNode->pstLeft->pstParent = pstNode;
+        pstNode->sLHeight = 1;
+    }
+    else
+    {
+        pstNode->sLHeight = 0;
+    }
+
+    pstNode->sRHeight = 0;
+    pstNode->pstParent->pstRight = pstNode;
+
+    return;
+} /* AVL_Swap_Right_Most */
