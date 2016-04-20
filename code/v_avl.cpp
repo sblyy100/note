@@ -24,3 +24,27 @@ unsigned int VOS_V_AVLFini()
 {
     return VOS_OK;
 }
+void AVL_Rotate_Right(AVL_NODE **ppstSubTree)
+{
+    /* rotate ppstSubTree of AVL tree right                                   */
+    AVL_NODE *pstLeftSon;
+
+    pstLeftSon = (*ppstSubTree)->pstLeft;
+
+    (*ppstSubTree)->pstLeft = pstLeftSon->pstRight;
+    if (NULL != (*ppstSubTree)->pstLeft)
+    {
+        (*ppstSubTree)->pstLeft->pstParent = (*ppstSubTree);
+    }
+
+    (*ppstSubTree)->sLHeight = pstLeftSon->sRHeight;
+    pstLeftSon->pstParent    = (*ppstSubTree)->pstParent;
+    pstLeftSon->pstRight     = *ppstSubTree;
+    pstLeftSon->pstRight->pstParent = pstLeftSon;
+    pstLeftSon->sRHeight     = (1 + VOS_V2_AVL_MAX((*ppstSubTree)->sRHeight,
+                                                   (*ppstSubTree)->sLHeight));
+
+    *ppstSubTree = pstLeftSon;
+
+    return;
+} /* AVL_Rotate_Right */
